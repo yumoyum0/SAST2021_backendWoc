@@ -64,11 +64,13 @@
         </dependency>
 
         <!--数据库驱动-->
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <scope>runtime</scope>
+            <version>8.0.28</version>
         </dependency>
+
         <!--数据库连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
