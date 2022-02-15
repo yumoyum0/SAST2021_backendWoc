@@ -1,94 +1,65 @@
 package com.example.woc.controller;
 
 import com.example.woc.entity.Account;
+import com.example.woc.entity.Role;
+import com.example.woc.enums.ErrorEnums;
+import com.example.woc.exception.LocalException;
 import com.example.woc.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * @author: B21031520冯一轩
- * @create: 2022-01-15 04:19
- **/
+ * @author yumo
+ * @date 2022/2/14
+ */
 @RestController
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminController  extends UserController{
 
     //请仿照 User 补充 Admin 的三层架构并完成接口
 
     @Autowired
     UserServiceImpl userService;
 
+
     /**
      * 获取当前的账户总数
      *
      */
-    @GetMapping("/getAmount")
-    public Integer getAmountOfAccounts() {
+    @RequestMapping("/getAmount")
+    public Integer getAmountOfAccounts() throws LocalException {
 
-        List<Account> accounts = userService.queryAll();
-        return accounts.size();
+        if (getRole().contains("ADMIN")){
+            List<Account> accounts = userService.queryAll();
+            return accounts.size();
+        }else throw new LocalException(ErrorEnums.AUTHORITY_ERROR);
     }
 
     /**
      * 根据用户名删除账户
-     *
+     * @param username 被删除用户的名字
      */
-    @PutMapping("deleteAccount")
-    public void deleteAccount(String username, RedirectAttributes attributes) {
 
-        boolean b = userService.deleteUserByName(username);
-        if (b) {
-            attributes.addFlashAttribute("message", "删除用户成功");
+    @RequestMapping("deleteAccount")
+    public void deleteAccount(String username, Model model) throws LocalException {
 
-        } else {
-            attributes.addFlashAttribute("message", "删除用户失败");
+        List<String> tagetrole=userService.getRoleByUsername(username);
+        //当前用户权限真包含被删除用户的权限时
+        if ( getRole().containsAll(tagetrole) && !(tagetrole.containsAll(getRole())) ){
+            if (userService.queryByName(username) != null) {
+                userService.deleteAccountByName(username);
+                model.addAttribute("message", "删除用户成功");
+            } else {
+                model.addAttribute("message", "用户不存在,删除用户失败");
+                throw new LocalException(ErrorEnums.USER_NOT_EXIST_ERROR);
+            }
+        }else {
+            throw new LocalException(ErrorEnums.AUTHORITY_ERROR);
         }
     }
 
-    /**
-     * 编辑账户
-     */
-    @PutMapping("editAccount")
-    public void editAccount(Account account,RedirectAttributes attributes)
-    {
-        Integer id=account.getId();
-        if(id!=null)//更新
-        {
-            //当输入的用户名不存在
-            if (userService.queryByName(account.getUsername()).getId()==null)
-            {
-                boolean b=userService.updateUser(account);
-                if (b) {
-                    attributes.addFlashAttribute("message", "更新用户成功");
 
-                } else {
-                    attributes.addFlashAttribute("message", "更新用户失败");
-                }
-            }
-            else attributes.addAttribute("message","该用户名已存在");
-
-        }
-        else//添加
-        {
-            //当输入的用户名不存在
-            if (userService.queryByName(account.getUsername()).getId()==null)
-            {
-                boolean b=userService.addUser(account);
-                if (b) {
-                    attributes.addFlashAttribute("message", "添加用户成功");
-
-                } else {
-                    attributes.addFlashAttribute("message", "添加用户失败");
-                }
-            }
-            else
-                attributes.addAttribute("message","该用户名已存在");
-        }
     }
-}

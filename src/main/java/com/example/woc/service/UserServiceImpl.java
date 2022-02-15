@@ -1,23 +1,27 @@
 package com.example.woc.service;
 
 import com.example.woc.entity.Account;
+import com.example.woc.entity.Role;
 import com.example.woc.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * @author: B21031520冯一轩
- * @create: 2022-01-23
- **/
+ * @author yumo
+ * @date 2022/2/14
+ */
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
+
 
     @Autowired
     private UserMapper userMapper;
-
-
 
     @Override
     public List<Account> queryAll() {
@@ -34,20 +38,46 @@ public class UserServiceImpl implements UserService{
         return userMapper.queryById(id);
     }
 
-
     @Override
-    public boolean deleteUserByName(String username) {
-        return userMapper.deleteUserByName(username) > 0;
+    public Account queryByEmail(String email) {
+        return userMapper.queryByEmail(email);
     }
 
     @Override
-    public boolean updateUser(Account user) {
-        return userMapper.updateUser(user) > 0;
+    public boolean deleteAccountByName(String username) {
+        return userMapper.deleteAccountByName(username) > 0;
     }
 
     @Override
-    public boolean addUser(Account user) {
-        return userMapper.addUser(user) > 0;
+    public boolean updateAccount(Account user) {
+        return userMapper.updateAccount(user) > 0;
+    }
+
+    @Override
+    public void addAccount(Account account)  {
+        userMapper.addAccount(account);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userMapper.queryByName(username);
+    }
+    @Override
+    public void deleteAll(){userMapper.deleteAll();}
+    /**
+     * 根据用户名查询权限
+     * @param username
+     * @return
+     */
+    public List<String> getRoleByUsername(String username)
+    {
+        Account account=userMapper.queryByName(username);
+        List<String> roles=null;
+        for (Role e: account.getRoles())
+        {
+            roles.add(e.getRoleName());
+        }
+        return roles;
     }
 
 }

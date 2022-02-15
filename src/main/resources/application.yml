@@ -11,6 +11,16 @@ spring:
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml     #xml文件
-  type-aliases-package: com.example.woc.Account
+  type-aliases-package: com.example.woc.entity
 
+manager:
+  jwt:
+    secret: ea61b46dse2@manager@9ds966@codekiller@33da # 登录校验的密钥
+    pubKeyPath: C:\Users\yumo\.ssh\id_rsa.pub # 公钥地址
+    priKeyPath: C:\Users\yumo\.ssh\id_rsa # 私钥地址
+    expire: 30 # 过期时间,单位分钟
+    headerName: Authorization  #token的名称
+logging:
+  level:
+    com.example.woc: debug
 

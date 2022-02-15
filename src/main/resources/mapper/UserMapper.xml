@@ -13,18 +13,23 @@
     <select id="queryByName" parameterType="String" resultType="com.example.woc.entity.Account">
         select * from mabatis.account where username = #{username}
     </select>
-
-    <delete id="deleteUserById" parameterType="Integer">
+    <select id="queryByEmail" parameterType="String" resultType="com.example.woc.entity.Account">
+        select * from mabatis.account where email = #{email}
+    </select>
+    <delete id="deleteAccountById" parameterType="Integer">
         delete from mabatis.account where id=#{id}
     </delete>
 
-    <update id="updateUser" parameterType="com.example.woc.entity.Account">
+    <update id="updateAccount" parameterType="com.example.woc.entity.Account">
         update mabatis.account
         set `username` = #{username},`password`= #{password}
         where id = #{id}
     </update>
 
-    <insert id="addUser" parameterType="com.example.woc.entity.Account">
-        insert into mabatis.account(username, password,email) values (#{username},#{password},#{email})
+    <insert id="addAccount" parameterType="com.example.woc.entity.Account">
+        insert into mabatis.account(username, password,email,role) values (#{username},#{password},#{email},#{role})
     </insert>
+    <delete id="deleteAll" >
+        delete from mabatis.account;
+    </delete>
 </mapper>
